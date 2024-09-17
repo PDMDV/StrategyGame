@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GS_Trigger.generated.h"
 
-class UGS_Action;
+class UGS_ActionInfo;
 
 UCLASS(Blueprintable, Abstract, EditInlineNew, CollapseCategories)
 class GRANDSTRATEGYGAME_API UGS_Trigger : public UObject
@@ -29,7 +29,7 @@ public:
 	bool Triggered(UObject* Owner, UObject* Triggerer);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, SimpleDisplay, meta = (DisplayName = "Actions", DisplayPriority = 0))
-	TArray<TObjectPtr<UGS_Action>> Actions;
+	TArray<TObjectPtr<UGS_ActionInfo>> Actions;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool Initialized;

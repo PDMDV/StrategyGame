@@ -1,9 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RequirementsList.h"
 #include "Engine/DataAsset.h"
 #include "GS_RequirementsData.generated.h"
+
+class URequirement;
 
 UCLASS(BlueprintType, Blueprintable)
 class GRANDSTRATEGYGAME_API UGS_RequirementsData : public UDataAsset
@@ -14,8 +15,8 @@ class GRANDSTRATEGYGAME_API UGS_RequirementsData : public UDataAsset
 	
 public:
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, SimpleDisplay, meta = (DisplayName = "Requirements", DisplayPriority = 0))
-	TObjectPtr<URequirementsList> RequirementsList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, SimpleDisplay, meta = (DisplayName = "Requirements", DisplayPriority = 0))
+	TArray<TObjectPtr<URequirement>> Requirements;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsCompliant(UObject* Source, UObject* Target);

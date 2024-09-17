@@ -1,7 +1,9 @@
 
 #include "BaseLibraries/GS_PointsManipulationLibrary.h"
 
+#include "Algo/ForEach.h"
 #include "BaseLibraries/GS_ArrayLibrary.h"
+#include "Map/GS_MapLibrary.h"
 #include "Voronoi/Voronoi.h"
 
 void UGS_PointsManipulationLibrary::MoreEvenlyDistributePoints(TArray<FVector>& Points, const FBox& BoundsIn, const float Strength)
@@ -30,5 +32,23 @@ void UGS_PointsManipulationLibrary::MoreEvenlyDistributePoints(TArray<FVector>& 
 	if(Strength > 1.0)
 	{
 		MoreEvenlyDistributePoints(Points, BoundsIn, Strength - 1.0f);
+	}
+}
+
+void UGS_PointsManipulationLibrary::MoreEvenlyDistributeCells(TArray<FCellInfo>& CellPoints, const FBox& BoundsIn, const float Strength)
+{
+	TArray<FVector> Points;
+	Points.Reserve(CellPoints.Num());
+	for(FCellInfo Cell : CellPoints)
+	{
+		Points.Add(Cell.VoronoiPoint);
+	}
+	
+	MoreEvenlyDistributePoints(Points, BoundsIn, Strength);
+
+	int Index = 0; 
+	for(FVector Point : Points)
+	{
+		CellPoints[Index++].VoronoiPoint = Point;
 	}
 }

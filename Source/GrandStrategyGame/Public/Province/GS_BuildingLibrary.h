@@ -18,9 +18,6 @@ struct FBuilding
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Level = 1;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Efficiency = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Mark = 0;

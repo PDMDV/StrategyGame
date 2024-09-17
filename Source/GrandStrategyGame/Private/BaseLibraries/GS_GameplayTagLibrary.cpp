@@ -11,6 +11,44 @@ FGameplayTagContainer UGS_GameplayTagLibrary::GetAllChildren(const FGameplayTag 
 	return Manager.RequestGameplayTagChildren(Tag);
 }
 
+FGameplayTagContainer UGS_GameplayTagLibrary::GetAllChildrenWithDepth(FGameplayTag Tag, int32 Depth, bool OnlyExactDepth)
+{
+	FGameplayTagContainer Result;
+	
+	int32 MainTagDepth = GetNumberOfTagNodes(Tag);
+	FGameplayTagContainer ChildTags = GetAllChildren(Tag);
+	for(FGameplayTag ChildTag : ChildTags)
+	{
+		if(OnlyExactDepth)
+		{
+			if(GetNumberOfTagNodes(ChildTag) == MainTagDepth + Depth)
+			{
+				Result.AddTag(ChildTag);
+			}
+		}
+		else
+		{
+			if(GetNumberOfTagNodes(ChildTag) <= MainTagDepth + Depth)
+			{
+				Result.AddTag(ChildTag);
+			}
+		}
+	}
+	return Result;
+}
+
+FGameplayTag UGS_GameplayTagLibrary::GetDirectParent(FGameplayTag Tag)
+{
+	const UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
+	return Manager.RequestGameplayTagDirectParent(Tag);
+}
+ 
+int32 UGS_GameplayTagLibrary::GetNumberOfTagNodes(FGameplayTag Tag)
+{
+	const UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
+	return Manager.GetNumberOfTagNodes(Tag);
+}
+
 FName UGS_GameplayTagLibrary::GetTagLastName(FGameplayTag Tag)
 {
 	const UGameplayTagsManager& Manager = UGameplayTagsManager::Get();

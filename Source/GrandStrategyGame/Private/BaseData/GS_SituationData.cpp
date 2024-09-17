@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BaseData/GS_SituationData.h"
-#include "Requirements/RequirementComponent.h"
+#include "Requirements/Requirement.h"
 
 UGS_SituationData::UGS_SituationData()
 {
@@ -9,7 +9,7 @@ UGS_SituationData::UGS_SituationData()
 
 bool UGS_SituationData::CanOccur_Implementation(UObject* Source, UObject* Target)
 {
-	for(URequirementComponent* Requirement : OccurrenceRequirements)
+	for(URequirement* Requirement : OccurrenceRequirements)
 	{
 		if(IsValid(Requirement) && !Requirement->IsCompliant(Source, Target))
 		{

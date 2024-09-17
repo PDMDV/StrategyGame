@@ -3,7 +3,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "AttributeSets/SettlementAttributeSet.h"
-#include "Country/GS_Country.h"
 
 AGS_Settlement::AGS_Settlement()
 {

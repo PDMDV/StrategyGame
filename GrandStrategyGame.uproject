@@ -12,7 +12,8 @@
 				"Engine",
 				"GeometryFramework",
 				"CoreUObject",
-				"GameplayAbilities"
+				"GameplayAbilities",
+				"UMG"
 			]
 		}
 	],

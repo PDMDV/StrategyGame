@@ -10,9 +10,9 @@ void USettlementAttributeSet::OnRep_ConstructionSpeed(const FGameplayAttributeDa
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USettlementAttributeSet, ConstructionSpeed, OldConstructionSpeed);
 }
 
-void USettlementAttributeSet::OnRep_WoodsBalance(const FGameplayAttributeData& OldWoodsBalance)
+void USettlementAttributeSet::OnRep_MigrationAttraction(const FGameplayAttributeData& OldMigrationAttraction)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USettlementAttributeSet, WoodsBalance, OldWoodsBalance);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USettlementAttributeSet, MigrationAttraction, OldMigrationAttraction);
 }
 
 void USettlementAttributeSet::OnRep_PopulationGrowth(const FGameplayAttributeData& OldPopulationGrowth)
@@ -20,12 +20,17 @@ void USettlementAttributeSet::OnRep_PopulationGrowth(const FGameplayAttributeDat
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USettlementAttributeSet, PopulationGrowth, OldPopulationGrowth);
 }
 
+void USettlementAttributeSet::OnRep_PopulationCapacity(const FGameplayAttributeData& OldPopulationCapacity)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USettlementAttributeSet, PopulationCapacity, OldPopulationCapacity);
+}
+
 void USettlementAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	GetConstructionSpeedAttribute();
 
 	DOREPLIFETIME_CONDITION_NOTIFY(USettlementAttributeSet, ConstructionSpeed, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(USettlementAttributeSet, WoodsBalance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USettlementAttributeSet, MigrationAttraction, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USettlementAttributeSet, PopulationGrowth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USettlementAttributeSet, PopulationCapacity, COND_None, REPNOTIFY_Always);
 }

@@ -12,6 +12,9 @@ class GRANDSTRATEGYGAME_API UGS_BaseObjectData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	
+	// Required by BlueprintLibraries
+	UWorld* GetWorld() const override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Name;
@@ -24,5 +27,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> Image;
-	
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	FString GetToolTipMessage(UObject* Source, UObject* Target);
 };

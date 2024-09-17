@@ -6,9 +6,11 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "BaseData/GS_BaseObjectData.h"
 #include "BaseData/GS_ProductionMethod.h"
-#include "Requirements/RequirementsList.h"
 #include "GS_BuildingData.generated.h"
 
+class UGS_Cost;
+class URequirement;
+class UGS_EffectInfo;
 class UGameplayEffect;
 
 UCLASS()
@@ -18,6 +20,9 @@ class GRANDSTRATEGYGAME_API UGS_BuildingData : public UGS_BaseObjectData
 
 	UGS_BuildingData();
 public:
+
+	UFUNCTION(BlueprintPure)
+	bool CanBeBuild(UObject* Target);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UGS_ProductionMethod> ProductionMethod;
@@ -25,11 +30,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag ConstructionAbilityTag;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, SimpleDisplay, meta = (DisplayName = "Requirements", DisplayPriority = 0))
-	TObjectPtr<URequirementsList> RequirementsList;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<TSubclassOf<UGameplayEffect>> Effects;
+	FGameplayTag UpgradeAbilityTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, SimpleDisplay, meta = (DisplayName = "Requirements", DisplayPriority = 0))
+	TArray<TObjectPtr<URequirement>> Requirements;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, SimpleDisplay, meta = (DisplayName = "Costs", DisplayPriority = 0))
+	TArray<TObjectPtr<UGS_Cost>> ConstructionCosts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, SimpleDisplay, meta = (DisplayName = "Effects", DisplayPriority = 0))
+	TArray<TObjectPtr<UGS_EffectInfo>> FinishEffects;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UGS_BuildingData> Upgrade;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UGS_BuildingData> Downgrade;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UGS_ProductionMethod> ConstructionMethod;

@@ -27,9 +27,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<UDynamicMeshComponent> MapMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<ULineComponent> CellsBorders;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<ULineComponent> Borders;
+	TObjectPtr<ULineComponent> RegionsBorders;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<ULineComponent> RiverSystem;

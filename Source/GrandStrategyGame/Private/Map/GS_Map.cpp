@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Map\GS_Map.h"
 
 #include "Line\GS_LineComponent.h"
@@ -11,14 +8,19 @@ AGS_Map::AGS_Map()
 	MapMesh = CreateDefaultSubobject<UDynamicMeshComponent>(TEXT("MapMesh"));
 	SetRootComponent(MapMesh);
 	
-	Borders = CreateDefaultSubobject<ULineComponent>(TEXT("Borders"));
-	Borders->SetupAttachment(GetRootComponent());
+	CellsBorders = CreateDefaultSubobject<ULineComponent>(TEXT("Test"));
+    CellsBorders->SetupAttachment(GetRootComponent());
+
+	RegionsBorders = CreateDefaultSubobject<ULineComponent>(TEXT("Regions Borders"));
+	RegionsBorders->SetupAttachment(GetRootComponent());
 	
 	RiverSystem = CreateDefaultSubobject<ULineComponent>(TEXT("RiverSystem"));
-	RiverSystem->SetupAttachment(GetRootComponent());
+	RiverSystem->SetupAttachment(GetRootComponent()); 
 
 	PCG = CreateDefaultSubobject<UPCGComponent>(TEXT("PCG"));
+#if WITH_EDITOR
 	PCG->OnPCGGraphCleanedDelegate.AddUObject(this, &AGS_Map::OnPCGCleanup);
+#endif
 }
 
 float AGS_Map::GetHeightAtLocation(FVector2D Location, FVector& Normal)

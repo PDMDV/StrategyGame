@@ -3,12 +3,20 @@
 
 #include "Requirements/GS_RequirementsData.h"
 
+#include "Requirements/Requirement.h"
+
 UGS_RequirementsData::UGS_RequirementsData()
 {
-	RequirementsList = CreateDefaultSubobject<URequirementsList>(TEXT("Requirements List"));
-}
+} 
 
 bool UGS_RequirementsData::IsCompliant(UObject* Source, UObject* Target)
 {
-	return RequirementsList->IsCompliant(Source, Target);
+	for(TObjectPtr<URequirement> Requirement : Requirements)
+	{
+		if(!Requirement->IsCompliant(Source, Target))
+		{
+			return false;
+		}
+	}
+	return true;
 }

@@ -8,9 +8,9 @@ public class GrandStrategyGame : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "PCG", "Core", "CoreUObject", "Engine", "InputCore", "Voronoi", "GeometryCore", "GeometryFramework", "GeometryScriptingCore", "GeometryScriptingEditor", "GeometryAlgorithms", "DynamicMesh", "GameplayTags", "GameplayAbilities", "GameplayTasks", "AIModule", "Slate", "SlateCore", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "PCG", "Core", "CoreUObject", "Engine", "InputCore", "Voronoi", "GeometryCore", "GeometryFramework", "GeometryScriptingCore", "MeshUtilitiesCommon", "GeometryAlgorithms", "DynamicMesh", "GameplayTags", "GameplayAbilities", "GameplayTasks", "AIModule", "Slate", "SlateCore", "UMG" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "PCG", "Voronoi", "GeometryCore", "GeometryFramework", "GeometryScriptingCore", "GeometryScriptingEditor", "GeometryAlgorithms", "DynamicMesh", "ModelingComponents", "ModelingComponents", "ModelingComponents", "AIModule", "AIModule", "AIModule", "GameplayTasks", "Slate", "SlateCore", "UMG", "MutableRuntime" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "PCG", "Voronoi", "GeometryCore", "GeometryFramework", "GeometryScriptingCore", "MeshUtilitiesCommon", "GeometryAlgorithms", "DynamicMesh", "ModelingComponents", "ModelingComponents", "ModelingComponents", "AIModule", "AIModule", "AIModule", "GameplayTasks", "Slate", "SlateCore", "UMG", "MutableRuntime" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -1,23 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Effect/GS_EffectInfo.h"
 #include "GS_Cost.generated.h"
 
 UCLASS(Blueprintable, Abstract, EditInlineNew, CollapseCategories)
-class GRANDSTRATEGYGAME_API UGS_Cost : public UObject
+class GRANDSTRATEGYGAME_API UGS_Cost : public UGS_EffectInfo
 {
 	GENERATED_BODY()
 
 	UGS_Cost();
-
-public:
-
-	// Required by BlueprintLibraries
-	UWorld* GetWorld() const override;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	bool CanAffordCost(UObject* Source, UObject* Target);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool Pay(UObject* Source, UObject* Target);
+	virtual bool IsCapable_Implementation(UObject* Source, UObject* Target, UObject* Outer) override;
 };

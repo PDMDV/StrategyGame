@@ -51,4 +51,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetClosestPointInArray(const FVector& Point, const TArray<FVector>& Array);
+
+	UFUNCTION(BlueprintPure)
+	static TArray<int32> FindSmallestElements(TArray<float> Array, int32 Number);
+
+	UFUNCTION(BlueprintPure)
+	static float Accumulate(const TArray<float>& Array);
 };

@@ -110,5 +110,4 @@ class GRANDSTRATEGYGAME_API UGS_AbilityTask_MoveInstances : public UAbilityTask
 
 	UPROPERTY()
 	float TimeSinceStart = 0.0f;
-	
 };

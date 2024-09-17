@@ -16,6 +16,15 @@ class GRANDSTRATEGYGAME_API UGS_GameplayTagLibrary : public UBlueprintFunctionLi
 	static FGameplayTagContainer GetAllChildren(FGameplayTag Tag);
 	
 	UFUNCTION(BlueprintPure, Category = "GameplayTags")
+	static FGameplayTagContainer GetAllChildrenWithDepth(FGameplayTag Tag, int32 Depth = 1, bool OnlyExactDepth = true);
+	
+	UFUNCTION(BlueprintPure, Category = "GameplayTags")
+	static FGameplayTag GetDirectParent(FGameplayTag Tag);
+	
+	UFUNCTION(BlueprintPure, Category = "GameplayTags")
+	static int32 GetNumberOfTagNodes(FGameplayTag Tag);
+	
+	UFUNCTION(BlueprintPure, Category = "GameplayTags")
 	static FName GetTagLastName(FGameplayTag Tag);
 	
 };

@@ -66,9 +66,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static void CorrectSpline(USplineComponent* Spline);
 	
+	UFUNCTION(BlueprintCallable)
+	static AActor* SpawnActor(UObject* Context, const FTransform Transform, TSubclassOf<AActor> Class);
+	
 	UFUNCTION(BlueprintPure)
 	static AGS_GameState* GetGSGameState(UObject* Context);
 
 	UFUNCTION(BlueprintPure)
 	static AGS_Map* GetMap(UObject* Context);
+
+	UFUNCTION(BlueprintPure, meta = (DeterminesOutputType = "ClassType"))
+	static UDataAsset* GetDataAsset(UDataAsset* DataAsset, TSubclassOf<UDataAsset> ClassType);
+
+	UFUNCTION(BlueprintPure)
+	static FString AddIndentation(const FString& InputText, int32 NumSpaces);
+	
+	UFUNCTION(BlueprintPure)
+    static FString AddSpacesBeforeCapitals(const FString& Input);
+
+	UFUNCTION(BlueprintPure)
+	static float GetCurveTime(const UCurveFloat* Curve, float Value);
+
+	UFUNCTION(BlueprintCallable)
+	static void RemoveEmptyStrings( UPARAM(ref)TArray<FString>& Array);
 };

@@ -7,6 +7,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "GS_GameState.generated.h"
 
+class UGS_ActionsManager;
+class UGS_TickManager;
 class UGS_MapData;
 
 UCLASS()
@@ -25,5 +27,14 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UGS_MapData* MapDataAsset;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//TObjectPtr<UGS_TickManager> TickManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGS_ActionsManager> ActionsManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGS_TickManager> TickManagerNew;
 	
 };

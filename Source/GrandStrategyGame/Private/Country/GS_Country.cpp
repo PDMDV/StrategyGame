@@ -4,6 +4,7 @@
 #include "Country\GS_Country.h"
 
 #include "AbilitySystemComponent.h"
+#include "DelayAction.h"
 #include "Line\GS_LineComponent.h"
 
 // Sets default values
@@ -17,13 +18,13 @@ AGS_Country::AGS_Country()
 	Borders->SetAbsolute(true,true,true);
 	
 	AbilitySystemComponent  = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("Ability Sytem Component"));
+	AttributeSet = CreateDefaultSubobject<UCountryAttributeSet>(TEXT("Attribute Set"));
 }
 
 // Called when the game starts or when spawned
 void AGS_Country::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

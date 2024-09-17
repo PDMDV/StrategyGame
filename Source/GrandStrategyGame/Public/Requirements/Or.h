@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Requirements/RequirementComponent.h"
+#include "Requirements/Requirement.h"
 #include "Or.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable, BlueprintType)
-class GRANDSTRATEGYGAME_API UOr : public URequirementComponent
+class GRANDSTRATEGYGAME_API UOr : public URequirement
 {
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, SimpleDisplay, meta = (DisplayName = "Or", DisplayPriority = 0))
-	TArray<TObjectPtr<URequirementComponent>> OrList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, SimpleDisplay, meta = (DisplayName = "Or", DisplayPriority = 0))
+	TArray<TObjectPtr<URequirement>> OrList;
 	
 	virtual bool IsCompliant(UObject* Source, UObject* Target);
 	

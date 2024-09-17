@@ -113,3 +113,30 @@ int32 UGS_ArrayLibrary::GetClosestPointInArray(const FVector& Point, const TArra
 	}
 	return Index;
 }
+
+TArray<int32> UGS_ArrayLibrary::FindSmallestElements(TArray<float> Array, int32 Number)
+{
+	TArray<TPair<int32, float>> ElementsWithIndices;
+	for (int32 i = 0; i < Array.Num(); ++i)
+	{
+		ElementsWithIndices.Emplace(i, Array[i]);
+	}
+	
+	Algo::Sort(ElementsWithIndices, [](const TPair<int32, float>& A, const TPair<int32, float>& B)
+	{
+		return A.Value < B.Value;
+	});
+	
+	TArray<int32> Result;
+	for (int32 i = 0; i < Number; ++i)
+	{
+		Result.Add(ElementsWithIndices[i].Key);
+	}
+
+	return Result;
+}
+
+float UGS_ArrayLibrary::Accumulate(const TArray<float>& Array)
+{
+	return Algo::Accumulate(Array, 0.0f);
+}

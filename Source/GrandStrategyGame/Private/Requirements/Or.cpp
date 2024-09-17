@@ -5,7 +5,7 @@
 
 bool UOr::IsCompliant(UObject* Source, UObject* Target)
 {
-	for(URequirementComponent* Requirement : OrList)
+	for(URequirement* Requirement : OrList)
 	{
 		if(IsValid(Requirement) && Requirement->IsCompliant(Source, Target))
 		{

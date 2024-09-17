@@ -4,6 +4,7 @@
 #include "GeomTools.h"
 #include "Algo/MaxElement.h"
 #include "Curve/PolygonOffsetUtils.h"
+#include "Field/FieldSystemNodes.h"
 #include "Kismet/KismetMathLibrary.h"
 
 FVector UGS_MathLibrary::Interpolate(const FVector& Start, const FVector& End, float Distance)
@@ -167,6 +168,43 @@ TArray<FVector2D> UGS_MathLibrary::PolygonsOffset(const TArray<FVector2D>& Point
 float UGS_MathLibrary::ConvertPercentage(const float Percentage, const int32 Times)
 {
 	return FMath::Pow(1.f + Percentage, 1.f/Times) - 1.f;
+}
+
+void UGS_MathLibrary::GetPolygonBounds(const TArray<FVector2D>& Polygon,  FVector2D& Min,  FVector2D& Max)
+{
+	if (Polygon.Num() == 0) return;
+	
+	Min = Polygon[0];
+	Max = Polygon[0];
+	for (const FVector2D& Vertex : Polygon)
+	{
+		if (Vertex.X < Min.X) Min.X = Vertex.X;
+		if (Vertex.Y < Min.Y) Min.Y = Vertex.Y;
+		if (Vertex.X > Max.X) Max.X = Vertex.X;
+		if (Vertex.Y > Max.Y) Max.Y = Vertex.Y;
+	}
+}
+
+TArray<FVector2D> UGS_MathLibrary::GetRandomPointsInsidePolygon(const TArray<FVector2D>& Polygon, const int32 PointsNumber)
+{
+	TArray<FVector2D> Result;
+	FVector2D Min, Max;
+	GetPolygonBounds(Polygon, Min, Max);
+
+	for(int32 i = 0 ; i < PointsNumber ; i++)
+	{
+		while(true)
+		{
+			FVector2D Point = FVector2D(FMath::FRandRange(Min.X, Max.X),
+										FMath::FRandRange(Min.Y, Max.Y));
+			if(FGeomTools2D::IsPointInPolygon(Point, Polygon))
+			{
+				Result.Add(Point);
+				break;
+			}
+		}
+	}
+	return Result;
 }
 
 int32 UGS_MathLibrary::GetRandomNumberWithAverage(float Average, int32 Max)

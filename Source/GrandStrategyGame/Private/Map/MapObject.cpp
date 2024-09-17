@@ -21,17 +21,17 @@ void AMapObject::AnnounceProvinceChange()
 
 void AMapObject::ChangeProvince(int32 NewProvinceID)
 {
-	OnProvinceChanged.Broadcast(ProvinceID, NewProvinceID);
-	ProvinceChanged(ProvinceID, NewProvinceID);
+	int32 OldProvinceID = ProvinceID;
 	ProvinceID = NewProvinceID;
 	AnnounceProvinceChange();
+	OnProvinceChanged.Broadcast(OldProvinceID, NewProvinceID);
 }
 
 void AMapObject::SetFogged(bool IsFogged)
 {
 	if(VisibilityType == EVisibilityType::Fogged)
 	{
-		GetRootComponent()->SetVisibility(IsFogged,true);
+		GetRootComponent()->SetVisibility(!IsFogged,true);
 	}
 }
 
@@ -59,10 +59,6 @@ void AMapObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AMapObject::ProvinceChanged_Implementation(int32 OldProvince, int32 NewProvince)
-{
 }
 
 

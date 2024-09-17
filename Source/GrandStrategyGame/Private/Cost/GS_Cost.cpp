@@ -7,18 +7,7 @@ UGS_Cost::UGS_Cost()
 {
 }
 
-
-bool UGS_Cost::CanAffordCost_Implementation(UObject* Payer, UObject* Causer)
+bool UGS_Cost::IsCapable_Implementation(UObject* Source, UObject* Target, UObject* Outer)
 {
-	return true;
-}
-
-bool UGS_Cost::Pay_Implementation(UObject* Payer, UObject* Causer)
-{
-	return true;
-}
-
-UWorld* UGS_Cost::GetWorld() const
-{
-	return nullptr;
+	return Super::IsCapable_Implementation(Source, Target, Outer);
 }

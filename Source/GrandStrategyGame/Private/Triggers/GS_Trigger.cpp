@@ -3,7 +3,7 @@
 
 #include "Triggers/GS_Trigger.h"
 
-#include "Action/GS_Action.h"
+#include "Action/GS_ActionInfo.h"
 
 UGS_Trigger::UGS_Trigger()
 {
@@ -31,9 +31,10 @@ bool UGS_Trigger::Register_Implementation(UObject* Object)
 
 bool UGS_Trigger::Triggered_Implementation(UObject* Owner, UObject* Triggerer)
 {
-	for(TObjectPtr<UGS_Action> Action : Actions)
+	for(TObjectPtr<UGS_ActionInfo> Action : Actions)
 	{
-		Action->Perform(Owner, Triggerer);
+		bool Success;
+		Action->Perform(Owner, Triggerer, Success);
 	}
 	return true;
 }

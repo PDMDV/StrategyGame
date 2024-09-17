@@ -1,12 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "AbilityTasks/GS_AbilityTask_SetFormation.h"
-
 #include "BaseLibraries/GS_Library.h"
 #include "Components/GS_ComponentContainer.h"
 #include "Components/SplineComponent.h"
-#include "MuR/Instance.h"
 #include "Net/UnrealNetwork.h"
 
 UGS_AbilityTask_SetFormation::UGS_AbilityTask_SetFormation()
@@ -95,16 +91,24 @@ void UGS_AbilityTask_SetFormation::CalculateDelays()
 	{
 		DistanceToEnd.Add({Index++, Spline->GetSplineLength()});
 	}
-	//Algo::Sort(DistanceToEnd,[](TPair<int32, float> A, TPair<int32, float> B){return A.Value < B.Value;});
 	
 	float PreviousInstanceReachTime = -Delay;
 	
-	for(auto Pair : DistanceToEnd)
+	for(auto Pair : DistanceToEnd) 
 	{
 		Index = Pair.Key;
 		
 		float TimeToReachEnd = Pair.Value / Speed;
-		InstancesData[Index].StartDelay = FMath::Max(PreviousInstanceReachTime + Delay - TimeToReachEnd, 0);
+		float InstanceDelay = PreviousInstanceReachTime + Delay - TimeToReachEnd;
+		if(InstanceDelay < 0)
+		{
+			for(int i = Index - 1 ; i >= 0 ; i--)
+			{
+				InstancesData[i].StartDelay += -InstanceDelay;
+			}
+			InstanceDelay = 0;
+		}
+		InstancesData[Index].StartDelay = InstanceDelay;
 		PreviousInstanceReachTime = InstancesData[Index].StartDelay + TimeToReachEnd;
 	}
 }
@@ -123,6 +127,8 @@ void UGS_AbilityTask_SetFormation::CorrectStartAndEndPosition(USplineComponent* 
 
 void UGS_AbilityTask_SetFormation::ConstructSpline(int32 Index)
 {
+	if(!Splines[Index]) return;
+	
 	FTransform ComponentTransform = Components->GetComponent(Index)->GetComponentTransform();
 	Splines[Index]->SetWorldLocation(ComponentTransform.GetLocation());
 	Splines[Index]->ClearSplinePoints();
@@ -159,7 +165,7 @@ void UGS_AbilityTask_SetFormation::UpdateComponentTransform(int32 Index, FTransf
 
 float UGS_AbilityTask_SetFormation::GetInstanceProgress(int32 Index)
 {
-	return (TimeSinceStart - InstancesData[Index].StartDelay) * Speed;
+	return (TimeSinceStart - InstancesData[Index].StartDelay) * InstancesData[Index].Speed;
 }
 
 void UGS_AbilityTask_SetFormation::TickTask(float DeltaTime)
@@ -206,7 +212,7 @@ void UGS_AbilityTask_SetFormation::TickTask(float DeltaTime)
 	if(InstancesData.IsEmpty())
 	{
 		OnFinish.Broadcast(0);
-		//EndTask();
+		EndTask();
 	} 
 }
 

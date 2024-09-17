@@ -1,7 +1,9 @@
 
 #include "BaseLibraries/GS_Library.h"
 
+#include "Algo/RemoveIf.h"
 #include "BaseData/GS_MapData.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/SplineComponent.h"
 #include "Game/GS_GameState.h"
 #include "Map/GS_Map.h"
@@ -31,7 +33,9 @@ TArray<FVector2D>& UGS_Library::GenerateUV(TArray<FVector2D>& UV, const TArray<F
 
 void UGS_Library::SetActorLabel(AActor* Actor, const FString& NewActorLabel)
 {
-	Actor->SetActorLabel(NewActorLabel); 
+#if WITH_EDITOR
+	Actor->SetActorLabel(NewActorLabel);
+#endif
 }
 
 void UGS_Library::DestroyComponent(UActorComponent* Component)
@@ -95,6 +99,11 @@ void UGS_Library::CorrectSpline(USplineComponent* Spline)
 	}
 }
 
+AActor* UGS_Library::SpawnActor(UObject* Context, const FTransform Transform, const TSubclassOf<AActor> Class)
+{
+	return Context->GetWorld()->SpawnActor<AActor>(Class.Get(), Transform);
+}
+
 AGS_GameState* UGS_Library::GetGSGameState(UObject* Context)
 {
 	return Cast<AGS_GameState>(Context->GetWorld()->GetGameState());
@@ -103,6 +112,68 @@ AGS_GameState* UGS_Library::GetGSGameState(UObject* Context)
 AGS_Map* UGS_Library::GetMap(UObject* Context)
 {
 	return GetGSGameState(Context)->MapDataAsset->Map.Get();
+}
+
+UDataAsset* UGS_Library::GetDataAsset(UDataAsset* DataAsset, TSubclassOf<UDataAsset> ClassType)
+{
+	return DataAsset; 
+}
+
+FString UGS_Library::AddIndentation(const FString& InputText, int32 NumSpaces)
+{
+	FString Indentation = FString::ChrN(NumSpaces, TEXT(' '));
+	TArray<FString> Lines;
+	InputText.ParseIntoArrayLines(Lines);
+
+	for (FString& Line : Lines)
+	{
+		Line = Indentation + Line;
+	}
+
+	return FString::Join(Lines, TEXT("\n"));
+}
+
+FString UGS_Library::AddSpacesBeforeCapitals(const FString& Input)
+{
+	FString Result;
+	for (int32 i = 0; i < Input.Len(); i++)
+	{
+		if (FChar::IsUpper(Input[i]) && i > 0)
+		{
+			Result.AppendChar(' ');
+		}
+		Result.AppendChar(Input[i]);
+	}
+	return Result;
+}
+
+float UGS_Library::GetCurveTime(const UCurveFloat* Curve, float Value)
+{
+	int32 KeysNum = Curve->FloatCurve.GetNumKeys();
+	for(int32 i = 0 ; i < KeysNum ; i++)
+	{
+		FRichCurveKey LastKey = Curve->FloatCurve.Keys[i];
+		if(LastKey.Value < Value) 
+		{
+			if(i == 0)
+			{
+				return Curve->FloatCurve.Keys[0].Time;
+			}
+			FRichCurveKey FirstKey = Curve->FloatCurve.Keys[i-1];
+			ensure(FirstKey.InterpMode == RCIM_Linear);
+			float Alpha = (FirstKey.Value - Value) / (FirstKey.Value - LastKey.Value);
+			return FMath::Lerp(FirstKey.Time, LastKey.Time, Alpha);
+		}
+	}
+	return Curve->FloatCurve.Keys.Last().Time;
+}
+
+void UGS_Library::RemoveEmptyStrings(TArray<FString>& Array)
+{
+	Array.RemoveAll([](const FString& String)
+	{
+		return String.IsEmpty();
+	});
 }
 
 void UGS_Library::DrawDebugLines(UObject* Context, TArray<FVector> Points, FVector Offset, FColor Color, bool bEndLoop)

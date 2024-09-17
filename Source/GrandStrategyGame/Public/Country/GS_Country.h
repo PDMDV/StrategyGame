@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "AttributeSets/CountryAttributeSet.h"
 #include "GameFramework/Actor.h"
 #include "GS_Country.generated.h"
 
@@ -28,6 +29,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCountryAttributeSet> AttributeSet;
 	
 	virtual void BeginPlay() override;
 

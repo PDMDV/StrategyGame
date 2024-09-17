@@ -2,7 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Voronoi/Voronoi.h"
 #include "GS_MapLibrary.generated.h"
+
+struct FVoronoiCellInfo;
+
+struct FVoronoiCellInfoWithCenter
+{
+	FVoronoiCellInfo VoronoiCell;
+	FVector Center;
+};
 
 USTRUCT(BlueprintType)
 struct FBorderLoop
@@ -71,6 +80,9 @@ struct FCellInfo
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 MyIndex = -1;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 SubgraphIndex = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -191,10 +203,21 @@ UCLASS()
 class GRANDSTRATEGYGAME_API UGS_MapLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-public:
 
+private:
+	static TArray<FVoronoiCellInfo> BuildVoronoiCells(TArray<FVector> Points, const FBox& BoundsIn);
+	static TArray<FVoronoiCellInfo> BuildVoronoiCellsWithSubgraphs(TArray<FVector> Points, const FBox& BoundsIn, int32 MinSubgraphSize, int32 MaxSubgraphSize, TArray<int32>& SubgraphsFragmentsSizes, TArray<FVector>& AllCenters);
+	static void CalculateApexes(FCellMap& CellMap, FCellInfo& Cell, FVoronoiCellInfo VoronoiCell);
+	static FCellMap ConvertVoronoiCellsToCellMap(const TArray<FVector>& Points, const TArray<FVoronoiCellInfo>& AllCells);
+	static void CalculateApexesNeighbours(FCellMap& CellMap);
+	static void ApplyPreviousMap(FCellMap& Results, const FCellMap& Previous);
+
+public:
 	UFUNCTION(BlueprintCallable, meta = (AutoCreateRefTerm = "Previous"))
-	static FCellMap BuildVoronoi(TArray<FVector> Points, const FBox& BoundsIn, const FCellMap& Previous);
+	static FCellMap BuildCellMap(TArray<FVector> Points, const FBox& BoundsIn, const FCellMap& Previous);
+	
+	UFUNCTION(BlueprintCallable)
+	static FCellMap BuildCellMapWithSubgraphs(TArray<FVector> Points, const FBox& BoundsIn, int32 MinSubgraphSize, int32 MaxSubgraphSize);
 
 	UFUNCTION(BlueprintCallable)
 	static void FindEdgesLoop(const TArray<FEdgeInfo>& Edges, TArray<FEdgeInfo>& Result, TArray<FEdgeInfo>& Remains);

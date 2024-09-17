@@ -48,6 +48,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	static float ConvertPercentage(const float Percentage, const int32 Times);
 
+	UFUNCTION(BlueprintPure)
+	static void GetPolygonBounds(const TArray<FVector2D>& Polygon,  FVector2D& Min,  FVector2D& Max);
+
+	UFUNCTION(BlueprintPure)
+	static TArray<FVector2D> GetRandomPointsInsidePolygon(const TArray<FVector2D>& Polygon, int32 PointsNumber);
+
 	// TO DO this function doesnt work. Can be removed
 	UFUNCTION(BlueprintPure)
 	static int32 GetRandomNumberWithAverage(float Average, int32 Max);

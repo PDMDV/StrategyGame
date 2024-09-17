@@ -12,7 +12,7 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-class UGS_AttributesTags;
+class UGS_AttributesData;
 
 UCLASS()
 class GRANDSTRATEGYGAME_API UGSAttributeSet : public UAttributeSet
@@ -20,6 +20,6 @@ class GRANDSTRATEGYGAME_API UGSAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UGS_AttributesTags>  AttributesTags;
+	TObjectPtr<UGS_AttributesData>  AttributesTags;
 	
 };

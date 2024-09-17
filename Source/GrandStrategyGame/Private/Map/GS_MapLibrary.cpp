@@ -3,65 +3,101 @@
 
 #include "BaseLibraries/GS_ArrayLibrary.h"
 #include "BaseLibraries/GS_MathLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Voronoi/Voronoi.h"
 
-FCellMap UGS_MapLibrary::BuildVoronoi(TArray<FVector> Points, const FBox& BoundsIn, const FCellMap& Previous)
+TArray<FVoronoiCellInfo> UGS_MapLibrary::BuildVoronoiCells(TArray<FVector> Points, const FBox& BoundsIn)
 {
-	if(Points.IsEmpty()) return {};
+	TArray<FVoronoiCellInfo> Result;
 	FVoronoiDiagram VoronoiDiagram;
 	VoronoiDiagram.Initialize(Points, BoundsIn, 1.0f);
 
-	TArray<FVoronoiCellInfo> AllCells;
-	VoronoiDiagram.ComputeAllCells(AllCells);
+	VoronoiDiagram.ComputeAllCells(Result);
+	return Result;
+}
 
-	FCellMap Results;
+TArray<FVoronoiCellInfo> UGS_MapLibrary::BuildVoronoiCellsWithSubgraphs(TArray<FVector> Points, const FBox& BoundsIn, int32 MinSubgraphSize, int32 MaxSubgraphSize, TArray<int32>& SubgraphsFragmentsSizes, TArray<FVector>& FinalPoints)
+{
+	TArray<FVoronoiCellInfo> MainCells = BuildVoronoiCells(Points, BoundsIn);
+	for(const FVoronoiCellInfo& Cell : MainCells)
+	{
+		const TArray<FVector> Polygon = UGS_MathLibrary::ConvexHullAlgorithm(Cell.Vertices);
+		int32 SubgraphSize = UKismetMathLibrary::RandomIntegerInRange(MinSubgraphSize, MaxSubgraphSize);
+		TArray<FVector2D> SubgraphPoints = UGS_MathLibrary::GetRandomPointsInsidePolygon(UGS_ArrayLibrary::ConvertToVector2D(Polygon), SubgraphSize);
+		FinalPoints.Append(UGS_ArrayLibrary::ConvertToVector(SubgraphPoints));
+		SubgraphsFragmentsSizes.Add(SubgraphSize);
+	}
+	
+	return BuildVoronoiCells(FinalPoints, BoundsIn);
+}
+
+void UGS_MapLibrary::CalculateApexes(FCellMap& CellMap, FCellInfo& Cell, FVoronoiCellInfo VoronoiCell)
+{
+	for(FVector ApexPosition : VoronoiCell.Vertices)
+	{
+		if(ApexPosition.Z == 1 )
+		{
+			FApexInfo* Apex = Algo::FindByPredicate(CellMap.Apexes, [&](const FApexInfo& Apex)
+			{
+				return ApexPosition.Equals(Apex.Position, 0.01f);
+			});
+			if(Apex == nullptr)
+			{
+				int ApexIndex = CellMap.Apexes.Add(ApexPosition);
+				Apex = &CellMap.Apexes[ApexIndex];
+				Apex->MyIndex = ApexIndex;
+			}
+			Cell.ApexesIndexes.Push(Apex->MyIndex);
+			Apex->NeighborCells.AddUnique(Cell.MyIndex);
+		}
+	}
+}
+
+FCellMap UGS_MapLibrary::ConvertVoronoiCellsToCellMap(const TArray<FVector>& Points, const TArray<FVoronoiCellInfo>& AllCells)
+{
+	FCellMap Result;
 	int32 CellIndex = 0;
 	for(FVoronoiCellInfo Cell : AllCells)
 	{
 		Cell.Neighbors.RemoveAll([](int32 In){return In < 0;});
 		Cell.Vertices.RemoveAll([](FVector In){return In.Z < 0;});
 		Cell.Vertices = UGS_MathLibrary::ConvexHullAlgorithm(Cell.Vertices);
+		
 		FCellInfo ResultCell;
 		ResultCell.MassCenter = UGS_ArrayLibrary::GetCenterOfPoints(Cell.Vertices);
 		ResultCell.VoronoiPoint = Points[CellIndex];
 		ResultCell.MyIndex = CellIndex;
 		ResultCell.NeighborsCellsIndexes = Cell.Neighbors;
-		for(FVector ApexPosition : Cell.Vertices)
-		{
-			if(ApexPosition.Z == 1 )
-			{
-				FApexInfo* Apex = Algo::FindByPredicate(Results.Apexes, [&](const FApexInfo& Apex)
-				{
-					return ApexPosition.Equals(Apex.Position, 1.0f);
-				});
-				if(Apex == nullptr)
-				{
-					int ApexIndex = Results.Apexes.Add(ApexPosition);
-					Apex = &Results.Apexes[ApexIndex];
-					Apex->MyIndex = ApexIndex;
-				}
-				ResultCell.ApexesIndexes.Push(Apex->MyIndex);
-				Apex->NeighborCells.AddUnique(CellIndex);
-			}
-		}
-		Results.Cells.Add(ResultCell);
+		
+		CalculateApexes(Result, ResultCell, Cell);
+		
+		Result.Cells.Add(ResultCell);
 		CellIndex++;
 	}
+	CalculateApexesNeighbours(Result);
+	return Result;
+}
 
-	for(FApexInfo& ApexInfo : Results.Apexes)
+void UGS_MapLibrary::CalculateApexesNeighbours(FCellMap& CellMap)
+{
+	for(FApexInfo& ApexInfo : CellMap.Apexes)
 	{
 		for(int32 IndexCell : ApexInfo.NeighborCells)
 		{
-			int32 CellApexNum = Results.Cells[IndexCell].ApexesIndexes.Num();
-			int32 ApexIndexInCell = Results.Cells[IndexCell].ApexesIndexes.Find(ApexInfo.MyIndex);
+			int32 CellApexNum = CellMap.Cells[IndexCell].ApexesIndexes.Num();
+			int32 ApexIndexInCell = CellMap.Cells[IndexCell].ApexesIndexes.Find(ApexInfo.MyIndex);
 			
 			int32 ApexPreviousIndexInCell = (ApexIndexInCell > 0) ? (ApexIndexInCell-1) % CellApexNum : CellApexNum - 1;
 			int32 ApexNextIndexInCell = (ApexIndexInCell+1) % CellApexNum;
 
-			ApexInfo.NeighborApexes.AddUnique(Results.Cells[IndexCell].ApexesIndexes[ApexPreviousIndexInCell]);
-			ApexInfo.NeighborApexes.AddUnique(Results.Cells[IndexCell].ApexesIndexes[ApexNextIndexInCell]);
+			ApexInfo.NeighborApexes.AddUnique(CellMap.Cells[IndexCell].ApexesIndexes[ApexPreviousIndexInCell]);
+			ApexInfo.NeighborApexes.AddUnique(CellMap.Cells[IndexCell].ApexesIndexes[ApexNextIndexInCell]);
 		}
 	}
+}
+
+void UGS_MapLibrary::ApplyPreviousMap(FCellMap& Results, const FCellMap& Previous)
+{
 	if(!Previous.Cells.IsEmpty() && Previous.Cells.Num() <= Results.Cells.Num())
 	{
 		int32 Index = 0;
@@ -71,7 +107,40 @@ FCellMap UGS_MapLibrary::BuildVoronoi(TArray<FVector> Points, const FBox& Bounds
 			Index++;
 		}
 	}
+}
+
+FCellMap UGS_MapLibrary::BuildCellMap(TArray<FVector> Points, const FBox& BoundsIn, const FCellMap& Previous)
+{
+	if(Points.IsEmpty()) return {};
+	
+	TArray<FVoronoiCellInfo> AllCells = BuildVoronoiCells(Points, BoundsIn);
+	FCellMap Results = ConvertVoronoiCellsToCellMap(Points, AllCells);
+	
+	ApplyPreviousMap(Results, Previous);
 	return Results;
+}
+
+FCellMap UGS_MapLibrary::BuildCellMapWithSubgraphs(TArray<FVector> Points, const FBox& BoundsIn, int32 MinSubgraphSize, int32 MaxSubgraphSize)
+{
+	if(Points.IsEmpty() || MinSubgraphSize > MaxSubgraphSize) return {};
+
+	TArray<int32> SubgraphsFragmentsSizes;
+	TArray<FVector> Center;
+	TArray<FVoronoiCellInfo> AllCells = BuildVoronoiCellsWithSubgraphs(Points, BoundsIn, MinSubgraphSize, MaxSubgraphSize, SubgraphsFragmentsSizes, Center);
+	FCellMap Result = ConvertVoronoiCellsToCellMap(Center, AllCells);
+
+	int32 CellIndex = 0;
+	int32 SubgraphIndex = 0;
+	for(const int32 FragmentSize : SubgraphsFragmentsSizes)
+	{
+		for(int i = 0 ; i < FragmentSize ; i++)
+		{
+			Result.Cells[CellIndex].SubgraphIndex = SubgraphIndex;
+			CellIndex++;
+		}
+		SubgraphIndex++;
+	}
+	return Result;
 }
 
 void UGS_MapLibrary::FindEdgesLoop(const TArray<FEdgeInfo>& Edges, TArray<FEdgeInfo>& Result, TArray<FEdgeInfo>& Remains)
@@ -205,6 +274,8 @@ TArray<FEdgeInfo> UGS_MapLibrary::GetAllCellEdges(const FCellMap& Map, FCellInfo
 
 TArray<int32> UGS_MapLibrary::GetBorderApexIndexes(const FCellMap& Map, const TArray<int32>& CellIndexes)
 {
+	if(Map.Cells.IsEmpty()) return {};
+	
 	TMap<int32, int32> ApexRepetitions;
 	for(int32 CellIndex : CellIndexes)
 	{
@@ -244,7 +315,7 @@ int32 UGS_MapLibrary::GetNextApex(const FCellMap& Map, const TArray<int32>& Bord
 {
 	const FApexInfo& Apex = Map.Apexes[CurrentApex];
 
-	for( int32 NeighbourApex :Apex.NeighborApexes )
+	for(int32 NeighbourApex : Apex.NeighborApexes)
 	{
 		if(NeighbourApex != PreviousApex && BorderApexes.Contains(NeighbourApex) && IsNext(Map, CellIndexes, CurrentApex, NeighbourApex))
 		{
@@ -273,7 +344,6 @@ FBorderLoop UGS_MapLibrary::ExtractBorderLoop(const FCellMap& Map, TArray<int32>
 		PreviousApex = CurrentApexIndex;
 		CurrentApexIndex = NextApex;
 		BorderApexes.Remove(NextApex);
-
 	}
 	while(StartApex != CurrentApexIndex);
 

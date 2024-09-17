@@ -33,15 +33,13 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
- 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Events")
-	void ProvinceChanged(int32 OldProvince, int32 NewProvince);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeProvince(int32 NewProvinceID);
 
 	UFUNCTION(BlueprintCallable)
 	void SetFogged(bool IsFogged);
+	
 	void InitVisibility();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))

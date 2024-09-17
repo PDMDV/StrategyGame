@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,20 +5,25 @@
 #include "Goods/GS_GoodsLibrary.h"
 #include "GS_UnitData.generated.h"
 
-UCLASS()
+class UGS_PopData;
+
+UCLASS(BlueprintType)
 class GRANDSTRATEGYGAME_API UGS_UnitData : public UGS_BaseObjectData
 {
 	GENERATED_BODY()
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<FGoods> RecruitmentGoods;
+	FGoodsContainer RecruitmentGoods;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<FGoods> UpkeepGoods;
+	FGoodsContainer UpkeepGoods;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Salary;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UGS_PopData> RequiredPopType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Size = 100;
